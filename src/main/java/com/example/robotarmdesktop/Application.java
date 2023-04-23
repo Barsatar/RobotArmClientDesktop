@@ -8,6 +8,14 @@ import java.io.IOException;
 import java.util.ResourceBundle;
 
 public class Application extends javafx.application.Application {
+    private static Application applicationInstance;
+    private TCPSocket tcpSocket;
+
+    @Override
+    public void init() {
+        applicationInstance = this;
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         PropertiesManager propertiesManager = new PropertiesManager();
@@ -21,6 +29,14 @@ public class Application extends javafx.application.Application {
         stage.setTitle(bundleLocalization.getString("applicationStageTitle"));
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void createTCPSocket(String ip, String port) {
+        this.tcpSocket = new TCPSocket(ip, port);
+    }
+
+    public static Application getApplicationInstance() {
+        return applicationInstance;
     }
 
     public static void main(String[] args) {

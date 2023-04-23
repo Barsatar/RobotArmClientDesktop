@@ -58,11 +58,17 @@ public class ConnectionSceneController {
 
     @FXML
     protected void connectButtonOnClick() throws IOException {
+        PropertiesManager propertiesManager = new PropertiesManager();
+
         if (this.isSaveData) {
-            PropertiesManager propertiesManager = new PropertiesManager();
             propertiesManager.setValue("connection_settings.properties", "ip", this.connectionSceneIPAddressField.getText());
             propertiesManager.setValue("connection_settings.properties", "port", this.connectionScenePortField.getText());
         }
+
+        String ip = propertiesManager.getValue("connection_settings.properties", "ip");
+        String port = propertiesManager.getValue("connection_settings.properties", "port");
+
+        Application.getApplicationInstance().createTCPSocket(ip, port);
     }
 
     @FXML
