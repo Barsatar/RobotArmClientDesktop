@@ -65,10 +65,11 @@ public class ConnectionSceneController {
             propertiesManager.setValue("connection_settings.properties", "port", this.connectionScenePortField.getText());
         }
 
-        String ip = propertiesManager.getValue("connection_settings.properties", "ip");
-        String port = propertiesManager.getValue("connection_settings.properties", "port");
+        String ip = this.connectionSceneIPAddressField.getText();
+        String port = this.connectionScenePortField.getText();
 
-        Application.getApplicationInstance().createTCPSocket(ip, port);
+        Application.getApplicationInstance().getSocketManager().setConnectionData(ip, port);
+        Application.getApplicationInstance().getSocketManager().createTCPSocket();
     }
 
     @FXML

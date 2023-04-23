@@ -235,7 +235,19 @@ public class TCPSocket implements Runnable {
         }
     }
 
-    private  byte[] trimData(byte[] data) {
+    public boolean isNotNullSocket() {
+        if (this.socket != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isClosed() {
+        return this.socket.isClosed();
+    }
+
+    public  byte[] trimData(byte[] data) {
         int outDataSize = data.length;
 
         for (int i = data.length - 1; i >= 0; --i, --outDataSize) {
@@ -253,7 +265,7 @@ public class TCPSocket implements Runnable {
         return outData;
     }
 
-    private String removeTestConnectionData(String data) {
+    public String removeTestConnectionData(String data) {
         return data.replace("RA_TestConnection", "");
     }
 }

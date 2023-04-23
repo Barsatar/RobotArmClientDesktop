@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 
 public class Application extends javafx.application.Application {
     private static Application applicationInstance;
-    private TCPSocket tcpSocket;
+    private SocketManager socketManager;
 
     @Override
     public void init() {
@@ -18,6 +18,7 @@ public class Application extends javafx.application.Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        this.socketManager = new SocketManager();
         PropertiesManager propertiesManager = new PropertiesManager();
         ResourceBundle bundleLocalization = ResourceBundle.getBundle("localization_" + propertiesManager.getValue("application_settings.properties", "language"));
 
@@ -31,12 +32,11 @@ public class Application extends javafx.application.Application {
         stage.show();
     }
 
-    public void createTCPSocket(String ip, String port) {
-        this.tcpSocket = new TCPSocket(ip, port);
-    }
-
     public static Application getApplicationInstance() {
         return applicationInstance;
+    }
+    public SocketManager getSocketManager() {
+        return  this.socketManager;
     }
 
     public static void main(String[] args) {
