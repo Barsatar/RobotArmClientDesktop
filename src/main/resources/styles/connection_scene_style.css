@@ -1,0 +1,63 @@
+.check-box {
+    -fx-text-fill:  #634e4e;
+}
+
+.check-box .box {
+    -fx-background-color: #fff5f2;
+    -fx-background-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-color: #d77f5a;
+    -fx-border-radius: 3px;
+}
+
+.title {
+    -fx-text-fill:  #d77f5a;
+    -fx-opacity: 0.9;
+}
+
+.text-field {
+    -fx-text-fill:  #634e4e;
+}
+
+.text-edit {
+    -fx-background-color: #fff5f2;
+    -fx-background-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-color: #d77f5a;
+    -fx-border-radius: 3px;
+}
+
+.connect-button {
+    -fx-text-fill: #fff5f2;
+    -fx-background-radius: 3px;
+    -fx-background-color: #d77f5a;
+    -fx-border-width: 1px;
+    -fx-border-color: #883d1d;
+    -fx-border-radius: 3px;
+}
+
+.menu-buttons {
+    -fx-background-radius: 3px;
+    -fx-background-color:  #ffeacd;
+    -fx-border-width: 2px;
+    -fx-border-color: #d77f5a;
+    -fx-border-radius: 3px;
+}
+
+.menu-item {
+    -fx-background-color:  #ffeacd;
+}
+
+.menu-item .label {
+    -fx-text-fill: #634e4e;
+    -fx-opacity: 0.7;
+}
+
+.menu-item:focused .label {
+    -fx-text-fill: #634e4e;
+    -fx-opacity: 1;
+}
+
+.context-menu {
+    -fx-background-color:  #ffeacd;
+}
