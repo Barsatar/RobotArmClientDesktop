@@ -4,155 +4,101 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class TCPSocket implements Runnable {
+    private String ip = null;
+    private Integer port = null;
     private Socket socket = null;
+    private InputStream inputStream = null;
+    private OutputStream outputStream = null;
     private Thread socketThread = null;
     private Thread sendDataListenerThread = null;
     private Thread receiveDataListenerThread = null;
     private Thread testConnectionThread = null;
-    private OutputStream outputStream = null;
-    private InputStream inputStream = null;
-    private String ip = "";
-    private String port = "";
-    private boolean errorStatus = false;
+    private boolean isWork = false;
     private ArrayList<byte[]> sendDataArray = new ArrayList<>();
     private ArrayList<byte[]> receiveDataArray = new ArrayList<>();
 
-    public TCPSocket(String ip, String port) {
+    public TCPSocket(String ip, Integer port) {
         this.ip = ip;
         this.port = port;
+
         this.createSocketThread();
     }
 
     @Override
     public void run() {
-        this.errorStatus = false;
+        this.isWork = true;
 
         this.createSocket();
-        if (this.errorStatus) {
-            return;
-        }
-
-        this.createInputStream();
-        if (this.errorStatus) {
-            this.closeSocket();
-            return;
-        }
-
         this.createOutputStream();
-        if (this.errorStatus) {
-            this.closeInputStream();
-            this.closeSocket();
-            return;
-        }
+        this.createInputStream();
 
         this.createSendDataListenerThread();
         this.createReceiveDataListenerThread();
         this.createTestConnectionThread();
 
-        while (true) {
-            if (this.errorStatus) {
-                try {
-                    this.sendDataListenerThread.join();
-                    this.receiveDataListenerThread.join();
-                    this.testConnectionThread.join();
-                } catch (InterruptedException e) {
-                    System.out.println("RAD_TCPSocket_Run: Error(" + e + ").");
-                }
-
-                break;
-            }
+        try {
+            this.sendDataListenerThread.join();
+            this.receiveDataListenerThread.join();
+            this.testConnectionThread.join();
+        } catch (InterruptedException e) {
+            this.isWork = false;
         }
 
-        this.closeInputStream();
         this.closeOutputStream();
+        this.closeInputStream();
         this.closeSocket();
     }
 
-    public void sendDataListener() {
-        while (true) {
-            if (this.sendDataArray.size() > 0) {
-                this.sendData(this.sendDataArray.remove(0));
-            }
-
-            if (this.errorStatus) {
-                break;
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    public void receiveDataListener() {
-        byte[] data;
-
-        while (true) {
-            data = this.receiveData();
-
-            if (this.errorStatus) {
-                break;
-            }
-
-            if (this.removeTestConnectionData(new String(this.trimData(data))).length() != 0) {
-                this.receiveDataArray.add(data);
-            }
-        }
-    }
-
-    public void testConnection() {
-        while (true) {
-            this.sendData("RA_TestConnection".getBytes(StandardCharsets.UTF_8));
-
-            if (this.errorStatus) {
-                break;
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    public synchronized void sendData(byte[] data) {
+    public void createSocket() {
         try {
-            this.outputStream.write(data);
-            this.outputStream.flush();
-
-            if (this.removeTestConnectionData(new String(this.trimData(data))).length() != 0) {
-                System.out.println("RAD_TCPSocket_SendData: OK (" + new String(data) + ").");
-            }
+            this.socket = new Socket(this.ip, this.port);
         } catch (IOException e) {
-            System.out.println("RAD_TCPSocket_SendData: Error(" + e + ").");
-            this.errorStatus = true;
+            this.isWork = false;
         }
     }
 
-    public synchronized byte[] receiveData() {
-        int bufferSize = 1024;
-        byte[] data = new byte[bufferSize];
-
+    public void createOutputStream() {
         try {
-            this.inputStream.read(data);
-
-            if (this.removeTestConnectionData(new String(this.trimData(data))).length() != 0) {
-                System.out.println("RAD_TCPSocket_ReceiveData: OK (" + new String(data) + ").");
-            }
-        } catch (IOException e) {
-            System.out.println("RAD_TCPSocket_ReceiveData: Error(" + e + ").");
-            this.errorStatus = true;
+            this.outputStream = this.socket.getOutputStream();
+        } catch (IOException | NullPointerException e) {
+            this.isWork = false;
         }
+    }
 
-        return data;
+    public void createInputStream() {
+        try {
+            this.inputStream = this.socket.getInputStream();
+        } catch (IOException | NullPointerException e) {
+            this.isWork = false;
+        }
+    }
+
+    public void closeSocket() {
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            this.isWork = true;
+        }
+    }
+
+    public void closeInputStream() {
+        try {
+            this.inputStream.close();
+        } catch (IOException e) {
+            this.isWork = true;
+        }
+    }
+
+    public void closeOutputStream() {
+        try {
+            this.outputStream.close();
+        } catch (IOException e) {
+            this.isWork = true;
+        }
     }
 
     public void createSocketThread() {
@@ -179,72 +125,72 @@ public class TCPSocket implements Runnable {
         this.testConnectionThread.start();
     }
 
-    public void createSocket() {
+    public void sendDataListener() {
+        while (this.isWork) {
+            if (this.sendDataArray.size() > 0) {
+                this.sendData(this.sendDataArray.remove(0));
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void receiveDataListener() {
+        byte[] data;
+
+        while (this.isWork) {
+            data = this.receiveData();
+
+            if (this.removeTestConnectionData(new String(this.trimData(data))).length() > 0) {
+                this.receiveDataArray.add(data);
+            }
+        }
+    }
+
+    public void testConnection() {
+        while (this.isWork) {
+            this.sendData("RA_TestConnection".getBytes(StandardCharsets.UTF_8));
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public synchronized void sendData(byte[] data) {
         try {
-            this.socket = new Socket(this.ip, Integer.parseInt(this.port));
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            this.outputStream.write(data);
+            this.outputStream.flush();
+
+            if (this.removeTestConnectionData(new String(this.trimData(data))).length() != 0) {
+                System.out.println("RAD_TCPSocket_SendData: OK (" + new String(data) + ").");
+            }
         } catch (IOException e) {
-            System.out.println("RAD_TCPSocket_CreateSocket: Error(" + e + ").");
-            this.errorStatus = true;
+            this.isWork = false;
         }
     }
 
-    public void createInputStream() {
+    public synchronized byte[] receiveData() {
+        int bufferSize = 1024;
+        byte[] data = new byte[bufferSize];
+
         try {
-            this.inputStream = this.socket.getInputStream();
+            this.inputStream.read(data);
+
+            if (this.removeTestConnectionData(new String(this.trimData(data))).length() != 0) {
+                System.out.println("RAD_TCPSocket_ReceiveData: OK (" + new String(data) + ").");
+            }
         } catch (IOException e) {
-            System.out.println("RAD_TCPSocket_CreateInputStream: Error(" + e + ").");
-            this.errorStatus = true;
+            this.isWork = false;
         }
-    }
 
-    public void createOutputStream() {
-        try {
-            this.outputStream = this.socket.getOutputStream();
-        } catch (IOException e) {
-            System.out.println("RAD_TCPSocket_CreateOutputStream: Error(" + e + ").");
-            this.errorStatus = true;
-        }
-    }
-
-    public void closeSocket() {
-        try {
-            this.socket.close();
-        } catch (IOException e) {
-            System.out.println("RAD_TCPSocket_CloseSocket: Error(" + e + ").");
-            this.errorStatus = true;
-        }
-    }
-
-    public void closeInputStream() {
-        try {
-            this.inputStream.close();
-        } catch (IOException e) {
-            System.out.println("RAD_TCPSocket_CloseInputStream: Error(" + e + ").");
-            this.errorStatus = true;
-        }
-    }
-
-    public void closeOutputStream() {
-        try {
-            this.outputStream.close();
-        } catch (IOException e) {
-            System.out.println("RAD_TCPSocket_CloseOutputStream: Error(" + e + ").");
-            this.errorStatus = true;
-        }
-    }
-
-    public boolean isNotNullSocket() {
-        if (this.socket != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isClosed() {
-        return this.socket.isClosed();
+        return this.removeTestConnectionData(new String(this.trimData(data))).getBytes(StandardCharsets.UTF_8);
     }
 
     public  byte[] trimData(byte[] data) {
@@ -267,5 +213,35 @@ public class TCPSocket implements Runnable {
 
     public String removeTestConnectionData(String data) {
         return data.replace("RA_TestConnection", "");
+    }
+
+    public boolean isNotNullSocket() {
+        if (this.socket != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isClosed() {
+        return this.socket.isClosed();
+    }
+
+    public void sendDataArrayPushBack(byte[] data) {
+        this.sendDataArray.add(data);
+    }
+
+    public byte[] receiveDataArrayPopFront() {
+        byte[] data = new byte[0];
+
+        if (this.receiveDataArray.size() > 0) {
+            data = this.receiveDataArray.remove(0);
+        }
+
+        return data;
+    }
+
+    public Integer getReceiveDataArraySize() {
+        return this.receiveDataArray.size();
     }
 }

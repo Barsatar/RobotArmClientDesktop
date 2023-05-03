@@ -1,0 +1,122 @@
+.background-color {
+    -fx-background-color: #ffeacd;
+}
+
+.title {
+    -fx-text-fill:  #d77f5a;
+    -fx-opacity: 0.9;
+}
+
+.text-field {
+    -fx-text-fill:  #634e4e;
+    -fx-font-size: 16px;
+}
+
+.text-slider {
+    -fx-text-fill:  #634e4e;
+    -fx-font-size: 14px;
+}
+
+.text-edit {
+    -fx-background-color: #fff5f2;
+    -fx-background-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-color: #d77f5a;
+    -fx-border-radius: 3px;
+    -fx-font-size: 15px;
+}
+
+.button {
+    -fx-text-fill: #fff5f2;
+    -fx-background-radius: 3px;
+    -fx-background-color: #d77f5a;
+    -fx-border-width: 1px;
+    -fx-border-color: #883d1d;
+    -fx-border-radius: 3px;
+    -fx-background-insets: 0 1 0 1, 0, 0;
+    -fx-font-size: 12px;
+}
+
+.button:hover {
+    -fx-background-color: rgba(215, 127, 90, 0.5);
+    -fx-text-fill:  #634e4e;
+}
+
+.menu-bar {
+    -fx-background-color: rgba(215, 127, 90);
+    -fx-border-color: #883d1d;
+    -fx-border-width: 0px 0px 2px 0px;
+}
+
+.menu-bar .menu {
+    -fx-background-color: rgba(215, 127, 90);
+}
+
+.menu-bar .menu .label {
+    -fx-text-fill: #fff5f2;
+    -fx-font-size: 14px;
+}
+
+.menu-bar .menu:hover {
+    -fx-background-color: rgba(227, 155, 127, 0.45);
+}
+
+.menu-bar .menu:hover .label {
+    -fx-text-fill:  #634e4e;
+}
+
+.menu-bar .context-menu {
+    -fx-background-color: rgba(215, 127, 90, 0.8);
+    -fx-opacity: 0.95;
+}
+
+.menu-bar .context-menu .label {
+    -fx-text-fill: #2d2424;
+    -fx-font-size: 14px;
+}
+
+.menu-bar .menu-item:hover, .menu-item:showing, .menu-item:focused {
+    -fx-background-color: rgba(169, 99, 70, 0.8);
+}
+
+.background-color-bottom {
+    -fx-background-color: rgba(215, 127, 90, 0.5);
+    -fx-opacity: 0.7;
+}
+
+.text-edit {
+    -fx-background-color: #fff5f2;
+    -fx-background-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-color: #bba5a1;
+    -fx-border-radius: 3px;
+    -fx-font-size: 12px;
+    -fx-text-fill: #634e4e;
+    -fx-prompt-text-fill: rgba(99, 78, 78, 0.5);
+}
+
+.menu-buttons {
+    -fx-background-radius: 3px;
+    -fx-background-color: #ffeacd;
+    -fx-border-width: 2px;
+    -fx-border-color: #d77f5a;
+    -fx-border-radius: 3px;
+}
+
+.menu-buttons .label {
+    -fx-text-fill: #634e4e;
+    -fx-font-size: 14px;
+}
+
+.slider .thumb {
+    -fx-pref-width: 5px;
+    -fx-background-color: rgb(238, 178, 150);
+    -fx-border-color: rgba(215, 127, 90);
+    -fx-border-radius: 20px;
+}
+
+.slider .track {
+    -fx-background-color: #fff5f2;
+    -fx-border-color: #bba5a1;
+    -fx-border-radius: 3px;
+}

@@ -41,6 +41,20 @@ public class ConnectionSceneController {
     }
 
     @FXML
+    protected void switchMainScene() throws IOException {
+        PropertiesManager propertiesManager = new PropertiesManager();
+        ResourceBundle bundleLocalization = ResourceBundle.getBundle("localization_" + propertiesManager.getValue("application_settings.properties", "language"));
+
+        FXMLLoader loader = new FXMLLoader();
+        loader.setController("MainSceneController");
+        Parent root = loader.load(getClass().getClassLoader().getResource("software_control_scene_view.fxml"), bundleLocalization);
+        Stage stage = (Stage)this.connectionSceneConnectButton.getScene().getWindow();
+        Scene scene = new Scene(root, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
     protected void setLanguageRuButtonClick()  throws IOException {
         PropertiesManager propertiesManager = new PropertiesManager();
         propertiesManager.setValue("application_settings.properties", "language", "ru");
@@ -68,8 +82,9 @@ public class ConnectionSceneController {
         String ip = this.connectionSceneIPAddressField.getText();
         String port = this.connectionScenePortField.getText();
 
-        Application.getApplicationInstance().getSocketManager().setConnectionData(ip, port);
-        Application.getApplicationInstance().getSocketManager().createTCPSocket();
+        Application.getRobotArmManager().start(ip, Integer.valueOf(port));
+
+        this.switchMainScene();
     }
 
     @FXML
