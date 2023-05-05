@@ -58,12 +58,12 @@
                         <Insets right="20.0" />
                      </HBox.margin>
                   </ImageView>
-                  <Label fx:id="softwareControlUDPImageView" text="%softwareControlSceneUDPLabel">
+                  <Label text="%softwareControlSceneUDPLabel">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
                   </Label>
-                  <ImageView fitHeight="17.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="softwareControlUDPImageView" fitHeight="17.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@images/disconnect.png" />
                      </image>
@@ -135,17 +135,17 @@
                            <children>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                                  <children>
-                                    <Button fx:id="softwareSceneScriptStartRecordingButton" layoutX="32.0" mnemonicParsing="false" text="%softwareControlSceneScriptStartRecordingButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <Button fx:id="softwareSceneScriptStartRecordingButton" onAction="#startRecordingScriptButtonOnClick" layoutX="32.0" mnemonicParsing="false" text="%softwareControlSceneScriptStartRecordingButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
                                  <children>
-                                    <Button fx:id="softwareSceneScriptFinishRecordingButton" layoutX="21.0" layoutY="2.0" mnemonicParsing="false" text="%softwareControlSceneScriptFinishRecordingButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <Button fx:id="softwareSceneScriptFinishRecordingButton" onAction="#finishRecordingScriptButtonOnClick" layoutX="21.0" layoutY="2.0" mnemonicParsing="false" text="%softwareControlSceneScriptFinishRecordingButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
                                  <children>
-                                    <Button fx:id="softwareSceneScriptRunButton" layoutX="20.0" layoutY="14.0" mnemonicParsing="false" text="%softwareControlSceneScriptRunButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <Button fx:id="softwareSceneScriptRunButton" onAction="#runScriptButtonOnClick" layoutX="20.0" layoutY="14.0" mnemonicParsing="false" text="%softwareControlSceneScriptRunButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
@@ -217,7 +217,7 @@
                            <children>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                                  <children>
-                                    <Button fx:id="softwareSceneNeuralNetworkControlComputeAndApplyButton" layoutX="50.0" layoutY="2.0" mnemonicParsing="false" text="%softwareControlSceneNeuralNetworkControlComputeAndApplyButton" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
+                                    <Button fx:id="softwareSceneNeuralNetworkControlComputeAndApplyButton" onAction="#computeAndApplyButtonOnClick" layoutX="50.0" layoutY="2.0" mnemonicParsing="false" text="%softwareControlSceneNeuralNetworkControlComputeAndApplyButton" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
                                  </children>
                               </AnchorPane>
                               <GridPane>
@@ -435,7 +435,7 @@
                                     </GridPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
                                        <children>
-                                          <Button fx:id="softwareSceneManualControlApplyButton" layoutX="83.0" layoutY="7.0" mnemonicParsing="false" text="%softwareControlSceneManualControlApplyButton" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
+                                          <Button fx:id="softwareSceneManualControlApplyButton" onAction="#applyButtonOnClick" layoutX="83.0" layoutY="7.0" mnemonicParsing="false" text="%softwareControlSceneManualControlApplyButton" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
                                        </children>
                                     </AnchorPane>
                                  </children>

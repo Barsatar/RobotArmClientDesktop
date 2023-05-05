@@ -37,6 +37,12 @@ public class SocketManager implements Runnable {
             }
 
             if (this.tcpSocket != null) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
                 while (this.sendDataArrayTCPSocket.size() > 0) {
                     this.tcpSocket.sendDataArrayPushBack(this.sendDataArrayTCPSocket.remove(0).getBytes(StandardCharsets.UTF_8));
                 }
@@ -91,5 +97,21 @@ public class SocketManager implements Runnable {
         }
 
         return data;
+    }
+
+    public Boolean isTCPSocketWorkState() {
+        if ((this.tcpSocket == null) || (this.tcpSocket != null && this.tcpSocket.isNotNullSocket() && this.tcpSocket.isClosed())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public Boolean isUDPSocketWorkState() {
+        if ((this.udpSocket == null)) {
+            return false;
+        }
+
+        return true;
     }
 }

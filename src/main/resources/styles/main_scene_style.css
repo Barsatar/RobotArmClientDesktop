@@ -70,13 +70,26 @@
     -fx-opacity: 0.95;
 }
 
-.menu-bar .context-menu .label {
-    -fx-text-fill: #2d2424;
+.menu-buttons .context-menu {
+    -fx-background-color: rgba(215, 127, 90, 0.8);
+}
+
+.menu-buttons .menu-item:hover .label {
+    -fx-text-fill: #fff5f2;
     -fx-font-size: 14px;
 }
 
-.menu-bar .menu-item:hover, .menu-item:showing, .menu-item:focused {
-    -fx-background-color: rgba(169, 99, 70, 0.8);
+.menu-buttons .context-menu .label {
+    -fx-text-fill:  #634e4e;
+    -fx-font-size: 14px;
+}
+
+.menu-bar .menu-item:hover, .menu-bar .menu-item:showing, .menu-bar .menu-item:focused {
+    -fx-background-color: rgba(169, 99, 70, 0.9);
+}
+
+.menu-buttons .menu-item:hover, .menu-buttons .menu-item:showing, .menu-buttons .menu-item:focused {
+    -fx-background-color: rgba(169, 99, 70, 0.9);
 }
 
 .background-color-bottom {
