@@ -2,18 +2,73 @@ package com.example.robotarmdesktop;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import javafx.scene.image.Image;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
 
-public class RobotArmManager {
+public class RobotArmManager implements Runnable {
     private SocketManager socketManager = null;
+    private Thread robotArmManagerThread = null;
+    private boolean isWork = false;
     private ArrayList<Module> modules = new ArrayList<>();
     private Boolean isRecording = false;
+    private Boolean isFrame = false;
+    private ArrayList<byte[]> framePartsArray = new ArrayList<>();
     private ArrayList<String> recordingCommands = new ArrayList<>();
+    private ArrayList<Map> getModulesConfigurationArray = new ArrayList<>();
+    private ArrayList<Map> getCurrentModulesConfigurationArray = new ArrayList<>();
+    private ArrayList<Map> detectObjectsArray = new ArrayList<>();
 
     public RobotArmManager() {
+        this.createRobotArmManagerThread();
+    }
+
+    @Override
+    public void run() {
+        this.isWork = true;
+
+        while (this.isWork) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (this.socketManager != null && this.socketManager.getReceiveDataArrayUDPSocketSize() > 0) {
+                this.framePartsArray.add(this.socketManager.receiveDataArrayPopFrontUDPSocket());
+            }
+
+            if (this.socketManager != null && this.socketManager.getReceiveDataArrayTCPSocketSize() > 0) {
+                String data = this.socketManager.receiveDataArrayPopFrontTCPSocket();
+
+                try {
+                    JsonMapper mapper = new JsonMapper();
+                    Map map = mapper.readValue(data, Map.class);
+
+                    if (map.get("command_type").equals("answer") && map.get("command").equals("get_modules_configuration")) {
+                        this.getModulesConfigurationArray.add(map);
+                    }
+
+                    if (map.get("command_type").equals("answer") && map.get("command").equals("get_current_modules_configuration")) {
+                        this.getCurrentModulesConfigurationArray.add(map);
+                    }
+
+                    if (map.get("command_type").equals("answer") && map.get("command").equals("detect_objects")) {
+                        this.detectObjectsArray.add(map);
+                    }
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    public void createRobotArmManagerThread() {
+        this.robotArmManagerThread = new Thread(this::run);
+        this.robotArmManagerThread.setPriority(Thread.NORM_PRIORITY);
+        this.robotArmManagerThread.start();
     }
 
     public void start(String ip, Integer port) {
@@ -38,6 +93,59 @@ public class RobotArmManager {
             String speedLevel = currentConfiguration.get("speed_level").toString();
 
             this.modules.add(new Module(id, type, minAngle, maxAngle, minSpeedLevel, maxSpeedLevel, currentAngle, currentSpeedLevel, angle, speedLevel));
+        }
+    }
+
+    public Image detectObjectsCommand(String threshold) {
+        this.socketManager.sendDataArrayPushBackUDPSocket("RAD_UDPSocket_Init");
+        this.framePartsArray.clear();
+
+        String command = "{\"socket\":\"tcp\", \"command_type\":\"detection\", \"command\":\"detect_objects\", \"data\":{\"threshold\":" + threshold + "}}";
+        this.socketManager.sendDataArrayPushBackTCPSocket(command);
+
+        int countOfFrameParts = 0;
+        int lastPartSize = 0;
+
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (this.detectObjectsArray.size() > 0) {
+                Map data = (Map) this.detectObjectsArray.remove(0).get("data");
+                countOfFrameParts = (int) data.get("count_of_frame_parts");
+                lastPartSize = (int) data.get("last_part_size");
+
+                break;
+            }
+        }
+
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (this.framePartsArray.size() == countOfFrameParts) {
+                File file = new File("src/main/resources/images/detection.png");
+
+                try {
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+                    for (byte[] framePart: this.framePartsArray) {
+                        fileOutputStream.write(framePart);
+                    }
+
+                    fileOutputStream.close();
+
+                    return new Image(file.toURI().toString());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -73,17 +181,16 @@ public class RobotArmManager {
         String command = "{\"socket\":\"tcp\", \"command_type\":\"request\", \"command\":\"get_modules_configuration\", \"data\":{}}";
         this.socketManager.sendDataArrayPushBackTCPSocket(command);
 
-        String data = "";
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
-        while (Objects.equals(data, "")) {
-            data = this.socketManager.receiveDataArrayByCommandTCPSocket("answer", "get_modules_configuration");
-        }
-
-        try {
-            JsonMapper mapper = new JsonMapper();
-            return (Map) mapper.readValue(data, Map.class).get("data");
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            if (this.getModulesConfigurationArray.size() > 0) {
+                return (Map) this.getModulesConfigurationArray.remove(0).get("data");
+            }
         }
     }
 
@@ -91,35 +198,16 @@ public class RobotArmManager {
         String command = "{\"socket\":\"tcp\", \"command_type\":\"request\", \"command\":\"get_current_modules_configuration\", \"data\": {}}";
         this.socketManager.sendDataArrayPushBackTCPSocket(command);
 
-        String data = "";
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
-        while (Objects.equals(data, "")) {
-            data = this.socketManager.receiveDataArrayByCommandTCPSocket("answer", "get_current_modules_configuration");
-        }
-
-        try {
-            JsonMapper mapper = new JsonMapper();
-            return (Map) mapper.readValue(data, Map.class).get("data");
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Map getCurrentModuleConfigurationById(String id) {
-        String command = "{\"socket\":\"tcp\", \"command_type\":\"request\", \"command\":\"get_current_module_configuration_by_id\", \"data\": {\"id\": " + id + "}}";
-        this.socketManager.sendDataArrayPushBackTCPSocket(command);
-
-        String data = "";
-
-        while (Objects.equals(data, "")) {
-            data = this.socketManager.receiveDataArrayByCommandTCPSocket("answer", "get_current_module_configuration_by_id");
-        }
-
-        try {
-            JsonMapper mapper = new JsonMapper();
-            return (Map) mapper.readValue(data, Map.class).get("data");
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            if (this.getCurrentModulesConfigurationArray.size() > 0) {
+                return (Map) this.getCurrentModulesConfigurationArray.remove(0).get("data");
+            }
         }
     }
 

@@ -3,7 +3,6 @@ package com.example.robotarmdesktop;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
@@ -17,6 +16,8 @@ public class SocketManager implements Runnable {
     private boolean isWork = false;
     private final ArrayList<String> sendDataArrayTCPSocket = new ArrayList<>();
     private final ArrayList<String> receiveDataArrayTCPSocket = new ArrayList<>();
+    private final ArrayList<String> sendDataArrayUDPSocket = new ArrayList<>();
+    private final ArrayList<byte[]> receiveDataArrayUDPSocket = new ArrayList<>();
 
     public SocketManager(String ip, Integer port) {
         this.ip = ip;
@@ -32,29 +33,57 @@ public class SocketManager implements Runnable {
         this.isWork = true;
 
         while (isWork) {
-            if (this.tcpSocket != null && this.tcpSocket.isNotNullSocket() && this.tcpSocket.isClosed()) {
-                this.tcpSocket = new TCPSocket(this.ip, this.port);
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
 
-            if (this.tcpSocket != null) {
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            //if (this.tcpSocket != null && this.tcpSocket.isNotNullSocket() && this.tcpSocket.isClosed()) {
+            //     this.tcpSocket = new TCPSocket(this.ip, this.port);
+            //}
 
+            if (this.tcpSocket != null) {
                 while (this.sendDataArrayTCPSocket.size() > 0) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
                     this.tcpSocket.sendDataArrayPushBack(this.sendDataArrayTCPSocket.remove(0).getBytes(StandardCharsets.UTF_8));
                 }
 
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                while (this.tcpSocket.getReceiveDataArraySize() > 0) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    this.receiveDataArrayTCPSocket.add(new String(this.tcpSocket.receiveDataArrayPopFront()));
+                }
+            }
+
+            if (this.udpSocket != null) {
+                while (this.sendDataArrayUDPSocket.size() > 0) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    this.udpSocket.sendDataArrayPushBack(this.sendDataArrayUDPSocket.remove(0).getBytes(StandardCharsets.UTF_8));
                 }
 
-                while (this.tcpSocket.getReceiveDataArraySize() > 0) {
-                    this.receiveDataArrayTCPSocket.add(new String(this.tcpSocket.receiveDataArrayPopFront()));
+                while (this.udpSocket.getReceiveDataArraySize() > 0) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    this.receiveDataArrayUDPSocket.add(this.udpSocket.receiveDataArrayPopFront());
                 }
             }
         }
@@ -65,6 +94,7 @@ public class SocketManager implements Runnable {
         this.socketManagerThread.setPriority(Thread.NORM_PRIORITY);
         this.socketManagerThread.start();
     }
+
     public void sendDataArrayPushBackTCPSocket(String data) {
         this.sendDataArrayTCPSocket.add(data);
     }
@@ -79,21 +109,16 @@ public class SocketManager implements Runnable {
         return data;
     }
 
-    public String receiveDataArrayByCommandTCPSocket(String commandType, String command) {
-        String data = "";
-        JsonMapper mapper = new JsonMapper();
+    public void sendDataArrayPushBackUDPSocket(String data) {
+        this.sendDataArrayUDPSocket.add(data);
+    }
 
-        for (int i = 0; i < this.receiveDataArrayTCPSocket.size(); ++i) {
-            try {
-                Map map = mapper.readValue(this.receiveDataArrayTCPSocket.get(i), Map.class);
+    public byte[] receiveDataArrayPopFrontUDPSocket() {
+        int bufferSize = 60000;
+        byte[] data = new byte[bufferSize];
 
-                if (map.get("command_type").equals(commandType) && map.get("command").equals(command)) {
-                    data = this.receiveDataArrayTCPSocket.remove(i);
-                    break;
-                }
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+        if (this.receiveDataArrayUDPSocket.size() > 0) {
+            data = this.receiveDataArrayUDPSocket.remove(0);
         }
 
         return data;
@@ -108,10 +133,18 @@ public class SocketManager implements Runnable {
     }
 
     public Boolean isUDPSocketWorkState() {
-        if ((this.udpSocket == null)) {
+        if (this.udpSocket == null) {
             return false;
         }
 
         return true;
+    }
+
+    public int getReceiveDataArrayUDPSocketSize() {
+        return this.receiveDataArrayUDPSocket.size();
+    }
+
+    public int getReceiveDataArrayTCPSocketSize() {
+        return this.receiveDataArrayTCPSocket.size();
     }
 }

@@ -6,7 +6,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -16,7 +15,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -27,8 +25,6 @@
         <menus>
           <Menu mnemonicParsing="false" text="%mainSceneMenuBarRobotArmControlMenu">
             <items>
-              <MenuItem mnemonicParsing="false" text="%mainSceneMenuBarSoftwareMenuItem" />
-                  <MenuItem mnemonicParsing="false" text="%mainSceneMenuBarNeuralNetworkMenuItem" />
             </items>
           </Menu>
         </menus>
@@ -50,7 +46,7 @@
                         <Insets left="5.0" right="5.0" />
                      </HBox.margin>
                   </Label>
-                  <ImageView fx:id="softwareControlTCPImageView" fitHeight="17.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="softwareSceneTCPImageView" fitHeight="17.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@images/connect.png" />
                      </image>
@@ -63,7 +59,7 @@
                         <Insets right="5.0" />
                      </HBox.margin>
                   </Label>
-                  <ImageView fx:id="softwareControlUDPImageView" fitHeight="17.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="softwareSceneUDPImageView" fitHeight="17.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@images/disconnect.png" />
                      </image>
@@ -96,16 +92,33 @@
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
-                     <children>
-                        <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: grey;">
-                           <GridPane.margin>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </GridPane.margin>
-                        </Pane>
-                     </children>
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
+                     <children>
+                        <GridPane>
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="130.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: gray;" GridPane.columnIndex="1">
+                                 <children>
+                                    <ImageView fx:id="softwareSceneDetectionSystemImageView" fitHeight="159.0" fitWidth="213.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0" />
+                                 </children>
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </AnchorPane>
+                           </children>
+                           <GridPane.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </GridPane.margin>
+                        </GridPane>
+                     </children>
                   </GridPane>
                   <GridPane stylesheets="@styles/main_scene_style.css" GridPane.columnIndex="1">
                     <columnConstraints>
@@ -135,17 +148,17 @@
                            <children>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                                  <children>
-                                    <Button fx:id="softwareSceneScriptStartRecordingButton" onAction="#startRecordingScriptButtonOnClick" layoutX="32.0" mnemonicParsing="false" text="%softwareControlSceneScriptStartRecordingButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <Button fx:id="softwareSceneScriptStartRecordingButton" layoutX="32.0" mnemonicParsing="false" onAction="#startRecordingScriptButtonOnClick" text="%softwareControlSceneScriptStartRecordingButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
                                  <children>
-                                    <Button fx:id="softwareSceneScriptFinishRecordingButton" onAction="#finishRecordingScriptButtonOnClick" layoutX="21.0" layoutY="2.0" mnemonicParsing="false" text="%softwareControlSceneScriptFinishRecordingButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <Button fx:id="softwareSceneScriptFinishRecordingButton" layoutX="21.0" layoutY="2.0" mnemonicParsing="false" onAction="#finishRecordingScriptButtonOnClick" text="%softwareControlSceneScriptFinishRecordingButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
                                  <children>
-                                    <Button fx:id="softwareSceneScriptRunButton" onAction="#runScriptButtonOnClick" layoutX="20.0" layoutY="14.0" mnemonicParsing="false" text="%softwareControlSceneScriptRunButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <Button fx:id="softwareSceneScriptRunButton" layoutX="20.0" layoutY="14.0" mnemonicParsing="false" onAction="#runScriptButtonOnClick" text="%softwareControlSceneScriptRunButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
@@ -170,22 +183,25 @@
                            </GridPane.margin>
                            <children>
                               <AnchorPane GridPane.rowIndex="1">
-                                 <children>
-                                    <Button fx:id="softwareSceneCameraStartButton" layoutX="20.0" layoutY="19.0" mnemonicParsing="false" text="%softwareControlSceneCameraStartButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                 </children>
                                  <GridPane.margin>
                                     <Insets />
                                  </GridPane.margin>
+                                 <children>
+                                    <TextField fx:id="softwareSceneDetectionSystemThresholdTextEdit" alignment="CENTER" layoutX="-17.0" layoutY="10.0" promptText="%softwareControlSceneDetectionSystemThresholdEditField" styleClass="text-edit" stylesheets="@styles/main_scene_style.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
                               </AnchorPane>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
                                  <children>
-                                    <Button fx:id="softwareSceneCameraStopButton" layoutX="38.0" layoutY="2.0" mnemonicParsing="false" text="%softwareControlSceneCameraStopButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <Button fx:id="softwareSceneDetectionSystemDetectObjectsButton" layoutY="-3.0" mnemonicParsing="false" onAction="#detectObjectsButtonOnClick" text="%softwareControlSceneDetectionSystemDetectObjectsButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
-                              <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3" />
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
+                                 <children>
+                                    <Button fx:id="softwareSceneDetectionSystemSortObjectsButton" layoutX="9.0" layoutY="-5.0" mnemonicParsing="false" text="%softwareControlSceneDetectionSystemSortObjectsButton" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children></AnchorPane>
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                  <children>
-                                    <Label styleClass="text-field" stylesheets="@styles/main_scene_style.css" text="%softwareControlSceneCameraLabel" />
+                                    <Label styleClass="text-field" stylesheets="@styles/main_scene_style.css" text="%softwareControlSceneDetectionSystemLabel" />
                                  </children>
                               </VBox>
                            </children>
@@ -217,7 +233,7 @@
                            <children>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                                  <children>
-                                    <Button fx:id="softwareSceneNeuralNetworkControlComputeAndApplyButton" onAction="#computeAndApplyButtonOnClick" layoutX="50.0" layoutY="2.0" mnemonicParsing="false" text="%softwareControlSceneNeuralNetworkControlComputeAndApplyButton" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
+                                    <Button fx:id="softwareSceneNeuralNetworkControlComputeAndApplyButton" layoutX="50.0" layoutY="2.0" mnemonicParsing="false" onAction="#computeAndApplyButtonOnClick" text="%softwareControlSceneNeuralNetworkControlComputeAndApplyButton" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
                                  </children>
                               </AnchorPane>
                               <GridPane>
@@ -242,7 +258,7 @@
                                     </AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
                                        <children>
-                                          <TextField fx:id="softwareSceneNeuralNetworkControlAlphaEditField" alignment="CENTER" layoutX="5.0" layoutY="6.0" promptText="%softwareControlSceneNeuralNetworkControlAlphaEditField" styleClass="text-edit" stylesheets="@styles/main_scene_style.css" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <TextField fx:id="softwareSceneNeuralNetworkControlThetaEditField" alignment="CENTER" layoutX="5.0" layoutY="6.0" promptText="%softwareControlSceneNeuralNetworkControlThetaEditField" styleClass="text-edit" stylesheets="@styles/main_scene_style.css" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
@@ -252,7 +268,7 @@
                                     </AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <children>
-                                          <TextField fx:id="softwareSceneNeuralNetworkControlThetaEditField" alignment="CENTER" layoutX="14.0" layoutY="2.0" promptText="%softwareControlSceneNeuralNetworkControlThetaEditField" styleClass="text-edit" stylesheets="@styles/main_scene_style.css" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <TextField fx:id="softwareSceneNeuralNetworkControlPsiEditField" alignment="CENTER" layoutX="14.0" layoutY="2.0" promptText="%softwareControlSceneNeuralNetworkControlPsiEditField" styleClass="text-edit" stylesheets="@styles/main_scene_style.css" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
@@ -262,7 +278,7 @@
                                     </AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                        <children>
-                                          <TextField fx:id="softwareSceneNeuralNetworkControlPsiEditField" alignment="CENTER" layoutX="-8.0" layoutY="2.0" promptText="%softwareControlSceneNeuralNetworkControlPsiEditField" styleClass="text-edit" stylesheets="@styles/main_scene_style.css" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <TextField fx:id="softwareSceneNeuralNetworkControlPhiEditField" alignment="CENTER" layoutX="-8.0" layoutY="2.0" promptText="%softwareControlSceneNeuralNetworkControlPhiEditField" styleClass="text-edit" stylesheets="@styles/main_scene_style.css" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                                  </children>
@@ -308,7 +324,7 @@
                                  <children>
                                     <VBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="100.0">
                                        <children>
-                                          <ImageView fx:id="softwareControlManualControlConstructionTypeImageView" fitHeight="101.0" fitWidth="101.0" pickOnBounds="true" preserveRatio="true">
+                                          <ImageView fx:id="softwareSceneManualControlConstructionTypeImageView" fitHeight="101.0" fitWidth="101.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="@images/type_1.png" />
                                              </image>
@@ -378,7 +394,7 @@
                                                 </HBox>
                                                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
                                                    <children>
-                                                      <Slider fx:id="softwareSceneManualControlAngleSlider"/>
+                                                      <Slider fx:id="softwareSceneManualControlAngleSlider" />
                                                    </children>
                                                 </HBox>
                                                 <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2">
@@ -435,7 +451,7 @@
                                     </GridPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
                                        <children>
-                                          <Button fx:id="softwareSceneManualControlApplyButton" onAction="#applyButtonOnClick" layoutX="83.0" layoutY="7.0" mnemonicParsing="false" text="%softwareControlSceneManualControlApplyButton" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
+                                          <Button fx:id="softwareSceneManualControlApplyButton" layoutX="83.0" layoutY="7.0" mnemonicParsing="false" onAction="#applyButtonOnClick" text="%softwareControlSceneManualControlApplyButton" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
                                        </children>
                                     </AnchorPane>
                                  </children>

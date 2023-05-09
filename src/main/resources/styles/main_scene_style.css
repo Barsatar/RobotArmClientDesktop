@@ -34,7 +34,7 @@
     -fx-border-color: #883d1d;
     -fx-border-radius: 3px;
     -fx-background-insets: 0 1 0 1, 0, 0;
-    -fx-font-size: 12px;
+    -fx-font-size: 11px;
 }
 
 .button:hover {

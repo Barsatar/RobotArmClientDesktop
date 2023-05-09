@@ -1,20 +1,14 @@
 package com.example.robotarmdesktop;
 
-import com.fasterxml.jackson.databind.type.MapLikeType;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class SoftwareControlSceneController {
@@ -39,7 +33,9 @@ public class SoftwareControlSceneController {
     @FXML
     private Label  softwareSceneManualControlConstructionTypeLabel;
     @FXML
-    private ImageView softwareControlManualControlConstructionTypeImageView;
+    private ImageView softwareSceneManualControlConstructionTypeImageView;
+    @FXML
+    private ImageView softwareSceneDetectionSystemImageView;
     @FXML
     private TextField softwareSceneNeuralNetworkControlXEditField;
     @FXML
@@ -53,9 +49,11 @@ public class SoftwareControlSceneController {
     @FXML
     private TextField softwareSceneNeuralNetworkControlPsiEditField;
     @FXML
-    private ImageView softwareControlTCPImageView;
+    private TextField softwareSceneDetectionSystemThresholdTextEdit;
     @FXML
-    private ImageView softwareControlUDPImageView;
+    private ImageView softwareSceneTCPImageView;
+    @FXML
+    private ImageView softwareSceneUDPImageView;
     private Module currentModule;
     private Boolean isListenerConnectionWork = false;
     private Thread listenerConnectionThread = null;
@@ -96,8 +94,8 @@ public class SoftwareControlSceneController {
         Image disconnect = new Image(file_disconnect.toURI().toString());
         Image connect = new Image(file_connect.toURI().toString());
 
-        this.softwareControlTCPImageView.setImage(disconnect);
-        this.softwareControlUDPImageView.setImage(disconnect);
+        this.softwareSceneTCPImageView.setImage(disconnect);
+        this.softwareSceneUDPImageView.setImage(disconnect);
 
         while (isListenerConnectionWork) {
             Boolean currentTCPSocketState = Application.getRobotArmManager().getTCPSocketState();
@@ -110,9 +108,9 @@ public class SoftwareControlSceneController {
                 tcpSocketState = currentTCPSocketState;
 
                 if (currentTCPSocketState) {
-                    this.softwareControlTCPImageView.setImage(connect);
+                    this.softwareSceneTCPImageView.setImage(connect);
                 } else {
-                    this.softwareControlTCPImageView.setImage(disconnect);
+                    this.softwareSceneTCPImageView.setImage(disconnect);
                 }
             }
 
@@ -120,9 +118,9 @@ public class SoftwareControlSceneController {
                 udpSocketState = currentUDPSocketState;
 
                 if (currentUDPSocketState) {
-                    this.softwareControlUDPImageView.setImage(connect);
+                    this.softwareSceneUDPImageView.setImage(connect);
                 } else {
-                    this.softwareControlUDPImageView.setImage(disconnect);
+                    this.softwareSceneUDPImageView.setImage(disconnect);
                 }
             }
         }
@@ -164,7 +162,7 @@ public class SoftwareControlSceneController {
 
         File file = new File("src/main/resources/images/" + this.currentModule.type + ".png");
         Image constructionType = new Image(file.toURI().toString());
-        this.softwareControlManualControlConstructionTypeImageView.setImage(constructionType);
+        this.softwareSceneManualControlConstructionTypeImageView.setImage(constructionType);
 
         this.softwareSceneManualControlAngleSlider.setMin(Double.parseDouble(this.currentModule.minAngel));
         this.softwareSceneManualControlAngleSlider.setMax(Double.parseDouble(this.currentModule.maxAngel));
@@ -228,5 +226,13 @@ public class SoftwareControlSceneController {
     @FXML
     public void runScriptButtonOnClick(ActionEvent event) {
         Application.getRobotArmManager().runScript();
+    }
+
+    @FXML
+    public void detectObjectsButtonOnClick(ActionEvent event) {
+        String threshold = this.softwareSceneDetectionSystemThresholdTextEdit.getText();
+        Image image = Application.getRobotArmManager().detectObjectsCommand(threshold);
+
+        this.softwareSceneDetectionSystemImageView.setImage(image);
     }
 }

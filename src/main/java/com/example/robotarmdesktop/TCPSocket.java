@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-public class TCPSocket implements Runnable {
+public class TCPSocket {
     private String ip = null;
     private Integer port = null;
     private Socket socket = null;
@@ -28,7 +28,6 @@ public class TCPSocket implements Runnable {
         this.createSocketThread();
     }
 
-    @Override
     public void run() {
         this.isWork = true;
 
@@ -39,18 +38,6 @@ public class TCPSocket implements Runnable {
         this.createSendDataListenerThread();
         this.createReceiveDataListenerThread();
         this.createTestConnectionThread();
-
-        try {
-            this.sendDataListenerThread.join();
-            this.receiveDataListenerThread.join();
-            this.testConnectionThread.join();
-        } catch (InterruptedException e) {
-            this.isWork = false;
-        }
-
-        this.closeOutputStream();
-        this.closeInputStream();
-        this.closeSocket();
     }
 
     public void createSocket() {
@@ -79,7 +66,9 @@ public class TCPSocket implements Runnable {
 
     public void closeSocket() {
         try {
-            this.socket.close();
+            if (this.socket != null) {
+                this.socket.close();
+            }
         } catch (IOException e) {
             this.isWork = true;
         }
@@ -87,17 +76,23 @@ public class TCPSocket implements Runnable {
 
     public void closeInputStream() {
         try {
-            this.inputStream.close();
+            if (this.inputStream != null) {
+                this.inputStream.close();
+            }
         } catch (IOException e) {
             this.isWork = true;
+            this.closeSocket();
         }
     }
 
     public void closeOutputStream() {
         try {
-            this.outputStream.close();
+            if (this.outputStream != null) {
+                this.outputStream.close();
+            }
         } catch (IOException e) {
             this.isWork = true;
+            this.closeSocket();
         }
     }
 
@@ -127,14 +122,14 @@ public class TCPSocket implements Runnable {
 
     public void sendDataListener() {
         while (this.isWork) {
-            if (this.sendDataArray.size() > 0) {
-                this.sendData(this.sendDataArray.remove(0));
-            }
-
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
+            }
+
+            if (this.sendDataArray.size() > 0) {
+                this.sendData(this.sendDataArray.remove(0));
             }
         }
     }
@@ -143,6 +138,12 @@ public class TCPSocket implements Runnable {
         byte[] data;
 
         while (this.isWork) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
             data = this.receiveData();
 
             if (this.removeTestConnectionData(new String(this.trimData(data))).length() > 0) {
@@ -153,13 +154,13 @@ public class TCPSocket implements Runnable {
 
     public void testConnection() {
         while (this.isWork) {
-            this.sendData("RA_TestConnection".getBytes(StandardCharsets.UTF_8));
-
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+
+            this.sendData("RA_TestConnection".getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -173,6 +174,9 @@ public class TCPSocket implements Runnable {
             }
         } catch (IOException e) {
             this.isWork = false;
+            this.closeOutputStream();
+            this.closeInputStream();
+            this.closeSocket();
         }
     }
 
@@ -188,6 +192,9 @@ public class TCPSocket implements Runnable {
             }
         } catch (IOException e) {
             this.isWork = false;
+            this.closeOutputStream();
+            this.closeInputStream();
+            this.closeSocket();
         }
 
         return this.removeTestConnectionData(new String(this.trimData(data))).getBytes(StandardCharsets.UTF_8);
@@ -241,7 +248,7 @@ public class TCPSocket implements Runnable {
         return data;
     }
 
-    public Integer getReceiveDataArraySize() {
+    public int getReceiveDataArraySize() {
         return this.receiveDataArray.size();
     }
 }
