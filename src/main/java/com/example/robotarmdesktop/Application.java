@@ -18,6 +18,7 @@ public class Application extends javafx.application.Application {
         robotArmManager = new RobotArmManager();
     }
 
+
     @Override
     public void start(Stage stage) throws IOException {
         PropertiesManager propertiesManager = new PropertiesManager();

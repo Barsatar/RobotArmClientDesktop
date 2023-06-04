@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RobotArmManager implements Runnable {
@@ -14,11 +15,12 @@ public class RobotArmManager implements Runnable {
     private boolean isWork = false;
     private ArrayList<Module> modules = new ArrayList<>();
     private Boolean isRecording = false;
-    private Boolean isFrame = false;
     private ArrayList<byte[]> framePartsArray = new ArrayList<>();
     private ArrayList<String> recordingCommands = new ArrayList<>();
+    private Map classScripts = new HashMap<>();
     private ArrayList<Map> getModulesConfigurationArray = new ArrayList<>();
     private ArrayList<Map> getCurrentModulesConfigurationArray = new ArrayList<>();
+    private ArrayList<Map> controlCommandArray = new ArrayList<>();
     private ArrayList<Map> detectObjectsArray = new ArrayList<>();
 
     public RobotArmManager() {
@@ -57,6 +59,10 @@ public class RobotArmManager implements Runnable {
 
                     if (map.get("command_type").equals("answer") && map.get("command").equals("detect_objects")) {
                         this.detectObjectsArray.add(map);
+                    }
+
+                    if (map.get("command_type").equals("answer") && map.get("command").equals("control_command")) {
+                        this.controlCommandArray.add(map);
                     }
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
@@ -164,17 +170,64 @@ public class RobotArmManager implements Runnable {
         }
 
         this.socketManager.sendDataArrayPushBackTCPSocket(command);
+
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (this.controlCommandArray.size() > 0) {
+                this.controlCommandArray.remove(0);
+
+                break;
+            }
+        }
     }
 
-    public void sendNeuralNetworkControlCommand(String x, String y, String z, String alpha, String theta, String psi) {
-        String command = "{\"socket\":\"tcp\", \"command_type\":\"control\", \"command\":\"neural_network_control\", \"data\":{\"x\":" + x + ", \"y\":" + y + ", \"z\":" + z + ", \"alpha\":" + alpha + ", \"theta\":" + theta + ", \"psi\":" + psi + "}}";
+    public void sendNeuralNetworkControlCommand(String x, String y, String z, String theta, String psi, String phi) {
+        String command = "{\"socket\":\"tcp\", \"command_type\":\"control\", \"command\":\"neural_network_control\", \"data\":{\"x\":" + x + ", \"y\":" + y + ", \"z\":" + z + ", \"theta\":" + theta + ", \"psi\":" + psi + ", \"phi\":" + phi + "}}";
 
         if (this.isRecording) {
-            String recordingCommand = "{\"command\": \"neural_network_control\", \"data\":{\"x\":" + x + ", \"y\":" + y + ", \"z\":" + z + ", \"alpha\":" + alpha + ", \"theta\":" + theta + ", \"psi\":" + psi + "}}";
+            String recordingCommand = "{\"command\": \"neural_network_control\", \"data\":{\"x\":" + x + ", \"y\":" + y + ", \"z\":" + z + ", \"theta\":" + theta + ", \"psi\":" + psi + ", \"phi\":" + phi + "}}";
             this.recordingCommands.add(recordingCommand);
         }
 
         this.socketManager.sendDataArrayPushBackTCPSocket(command);
+
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (this.controlCommandArray.size() > 0) {
+                this.controlCommandArray.remove(0);
+
+                break;
+            }
+        }
+    }
+
+    public void startPositionCommand() {
+        String command = "{\"socket\":\"tcp\", \"command_type\":\"control\", \"command\":\"start_position\", \"data\":{}}";
+        this.socketManager.sendDataArrayPushBackTCPSocket(command);
+
+        while (true) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (this.controlCommandArray.size() > 0) {
+                this.controlCommandArray.remove(0);
+
+                break;
+            }
+        }
     }
 
     public Map getModulesConfiguration() {
@@ -222,6 +275,23 @@ public class RobotArmManager implements Runnable {
         }
     }
 
+    public void updateModules() {
+        Map currentModulesConfiguration = this.getCurrentModulesConfiguration();
+
+        for (Object moduleIndex: currentModulesConfiguration.keySet()) {
+            Map currentConfiguration = (Map) currentModulesConfiguration.get(moduleIndex);
+
+            for (int i = 0; i < this.modules.size(); ++i) {
+                if (currentConfiguration.get("id").toString().equals(this.modules.get(i).id)) {
+                    this.modules.get(i).angle = currentConfiguration.get("angle").toString();
+                    this.modules.get(i).speedLevel = currentConfiguration.get("speed_level").toString();
+
+                    break;
+                }
+            }
+        }
+    }
+
     public ArrayList<Module> getModules() {
         return this.modules;
     }
@@ -246,6 +316,62 @@ public class RobotArmManager implements Runnable {
             String command = "{\"socket\":\"tcp\", \"command_type\":\"control\", \"command\":\"script\", \"data\":{" + recordingCommands.substring(0, recordingCommands.length() - 2) + "}}";
 
             this.socketManager.sendDataArrayPushBackTCPSocket(command);
+
+            while (true) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (this.controlCommandArray.size() > 0) {
+                    this.controlCommandArray.remove(0);
+
+                    break;
+                }
+            }
+        }
+    }
+
+    public void addClassScript(String className) {
+        if (!className.equals("") && this.recordingCommands.size() > 0 && !this.isRecording) {
+            String recordingCommands = "";
+
+            for (int i = 0; i < this.recordingCommands.size(); ++i) {
+                recordingCommands += "\"" + i + "\": " + this.recordingCommands.get(i) + ", ";
+            }
+
+            classScripts.put(className, recordingCommands.substring(0, recordingCommands.length() - 2));
+        }
+    }
+
+    public void sortObjectsCommand() {
+        if (this.classScripts.size() > 0) {
+            String classScriptCommands = "";
+
+            for (Object key : this.classScripts.keySet()) {
+                classScriptCommands += "\"" + key.toString() + "\": {" + this.classScripts.get(key).toString() + "}, ";
+            }
+
+            this.classScripts.clear();
+
+            String command = "{\"socket\":\"tcp\", \"command_type\":\"control\", \"command\":\"sort_objects\", \"data\":{" + classScriptCommands.substring(0, classScriptCommands.length() - 2) + "}}";
+
+            this.socketManager.sendDataArrayPushBackTCPSocket(command);
+
+            while (true) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (this.controlCommandArray.size() > 0) {
+                    this.controlCommandArray.remove(0);
+
+                    break;
+                }
+            }
         }
     }
 

@@ -43,13 +43,15 @@ public class SoftwareControlSceneController {
     @FXML
     private TextField softwareSceneNeuralNetworkControlZEditField;
     @FXML
-    private TextField softwareSceneNeuralNetworkControlAlphaEditField;
-    @FXML
     private TextField softwareSceneNeuralNetworkControlThetaEditField;
     @FXML
     private TextField softwareSceneNeuralNetworkControlPsiEditField;
     @FXML
-    private TextField softwareSceneDetectionSystemThresholdTextEdit;
+    private TextField softwareSceneNeuralNetworkControlPhiEditField;
+    @FXML
+    private TextField softwareSceneManipulatorThresholdTextEdit;
+    @FXML
+    private TextField softwareSceneSortSystemClassTextEdit;
     @FXML
     private ImageView softwareSceneTCPImageView;
     @FXML
@@ -152,7 +154,13 @@ public class SoftwareControlSceneController {
         this.currentModule = module;
 
         this.softwareSceneManualControlModuleMenuButton.setText(bundleLocalization.getString("softwareControlSceneManualControlModuleMenuButton") + " " + this.currentModule.id);
-        this.softwareSceneManualControlAngleLabel.setText(bundleLocalization.getString("softwareControlSceneManualControlAngleLabel") + " " + this.currentModule.angle);
+
+        if (this.currentModule.type == "type_5") {
+            this.softwareSceneManualControlAngleLabel.setText(bundleLocalization.getString("softwareControlSceneManualControlCompressionLabel") + " " + this.currentModule.angle);
+        } else {
+            this.softwareSceneManualControlAngleLabel.setText(bundleLocalization.getString("softwareControlSceneManualControlAngleLabel") + " " + this.currentModule.angle);
+        }
+
         this.softwareSceneManualControlAngleMinLabel.setText(this.currentModule.minAngel);
         this.softwareSceneManualControlAngleMaxLabel.setText(this.currentModule.maxAngel);
         this.softwareSceneManualControlSpeedLevelLabel.setText(bundleLocalization.getString("softwareControlSceneManualControlSpeedLevelLabel") + " " + this.currentModule.speedLevel);
@@ -198,7 +206,10 @@ public class SoftwareControlSceneController {
     @FXML
     public void applyButtonOnClick(ActionEvent event) {
         this.updateCurrentModule();
+
         Application.getRobotArmManager().sendManualControlCommand();
+        Application.getRobotArmManager().updateModules();
+        this.updateManualControlUI(this.currentModule.id);
     }
 
     @FXML
@@ -206,11 +217,13 @@ public class SoftwareControlSceneController {
         String x = this.softwareSceneNeuralNetworkControlXEditField.getText();
         String y = this.softwareSceneNeuralNetworkControlYEditField.getText();
         String z = this.softwareSceneNeuralNetworkControlZEditField.getText();
-        String alpha = this.softwareSceneNeuralNetworkControlAlphaEditField.getText();
         String theta = this.softwareSceneNeuralNetworkControlThetaEditField.getText();
         String psi = this.softwareSceneNeuralNetworkControlPsiEditField.getText();
+        String phi = this.softwareSceneNeuralNetworkControlPhiEditField.getText();
 
-        Application.getRobotArmManager().sendNeuralNetworkControlCommand(x, y, z, alpha, theta, psi);
+        Application.getRobotArmManager().sendNeuralNetworkControlCommand(x, y, z, theta, psi, phi);
+        Application.getRobotArmManager().updateModules();
+        this.updateManualControlUI(this.currentModule.id);
     }
 
     @FXML
@@ -226,13 +239,35 @@ public class SoftwareControlSceneController {
     @FXML
     public void runScriptButtonOnClick(ActionEvent event) {
         Application.getRobotArmManager().runScript();
+        Application.getRobotArmManager().updateModules();
+        this.updateManualControlUI(this.currentModule.id);
     }
 
     @FXML
     public void detectObjectsButtonOnClick(ActionEvent event) {
-        String threshold = this.softwareSceneDetectionSystemThresholdTextEdit.getText();
+        String threshold = this.softwareSceneManipulatorThresholdTextEdit.getText();
         Image image = Application.getRobotArmManager().detectObjectsCommand(threshold);
 
         this.softwareSceneDetectionSystemImageView.setImage(image);
+    }
+
+    @FXML
+    public void startPositionButtonOnClick(ActionEvent event) {
+        Application.getRobotArmManager().startPositionCommand();
+        Application.getRobotArmManager().updateModules();
+        this.updateManualControlUI(this.currentModule.id);
+    }
+
+    @FXML
+    public void addScriptButtonOnClick(ActionEvent event) {
+        String className = this.softwareSceneSortSystemClassTextEdit.getText();
+        Application.getRobotArmManager().addClassScript(className);
+    }
+
+    @FXML
+    public void sortObjectsButtonOnClick(ActionEvent event) {
+        Application.getRobotArmManager().sortObjectsCommand();
+        Application.getRobotArmManager().updateModules();
+        this.updateManualControlUI(this.currentModule.id);
     }
 }
